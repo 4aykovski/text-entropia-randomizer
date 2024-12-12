@@ -1,11 +1,13 @@
 package lib
 
 import (
+	"fmt"
 	"math"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/gobwas/glob/util/runes"
 	"golang.org/x/exp/rand"
 )
 
@@ -13,6 +15,38 @@ const (
 	russianTelegraphAlpabet = "абвгдежзийклмнопрстуфхцчшщьыэюя "
 	defaultStringLength     = 50
 )
+
+func GenerateStringByBlocks(path string) string {
+	fmt.Println("123")
+	text := russianTelegraphAlpabet
+	if path != "" {
+		text = GetDataFromFile(path)
+	}
+
+	symbolsCount := CountSymbols(text)
+
+	siftedSymbolsCount := SiftRussianTelegraphAlpabet(symbolsCount)
+
+	russianTotalCount := GetTotalCount(siftedSymbolsCount)
+
+	symbolsFrequency := CalculateSymbolsFrequency(siftedSymbolsCount, russianTotalCount)
+
+	return GenerateBlocks(text, symbolsFrequency)
+}
+
+func GenerateBlocks(text string, symbolsFrequency map[string]float64) string {
+	oldBlock := PickNSymbolsInText(text, symbolsFrequency, 0, 1)
+	fmt.Println("first bloc", oldBlock)
+	for {
+		newBlock := FindBlockInText(text, oldBlock, 2)
+		fmt.Println(newBlock)
+		if newBlock == "" {
+			return oldBlock
+		}
+
+		oldBlock = newBlock
+	}
+}
 
 func GenerateTwoString(path string, length int, shift int) (string, string) {
 	text := russianTelegraphAlpabet
@@ -38,6 +72,18 @@ func GenerateTwoString(path string, length int, shift int) (string, string) {
 	return entropyOutput, oneShiftOutput
 }
 
+func FindBlockInText(text string, block string, length int) string {
+	index := runes.Index([]rune(text), []rune(block))
+	fmt.Println("index", index)
+	fmt.Println(string([]rune(text)[index : index+len(block)]))
+
+	if index != -1 {
+		return string([]rune(text)[index : index+length+len(block)])
+	}
+
+	return ""
+}
+
 func GenerateStringWithNShift(
 	text string,
 	symbolsFrequency map[string]float64,
@@ -51,6 +97,29 @@ func GenerateStringWithNShift(
 	}
 
 	return output
+}
+
+func PickNSymbolsInText(
+	text string,
+	symbolsFrequency map[string]float64,
+	n int,
+	length int,
+) string {
+	symbolsPositions := GetSymbolsPositions(text)
+
+	symbol := PickSymbolBasedOnFrequency(symbolsFrequency)
+
+	symbolPositions := symbolsPositions[symbol]
+
+	r := rand.New(rand.NewSource(uint64(time.Now().UnixNano()))).Intn(len(symbolPositions))
+
+	for {
+		out := string([]rune(text)[symbolPositions[r]+n*2])
+		if strings.Contains(russianTelegraphAlpabet, out) {
+			return string([]rune(text)[symbolPositions[r]+n*2 : symbolPositions[r]+n*2+length*2])
+		}
+		n++
+	}
 }
 
 func PickNSymbolInText(text string, symbolsFrequency map[string]float64, n int) string {

@@ -9,6 +9,7 @@ require (
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/fyne-io/glfw-js v0.0.0-20240101223322-6e1efdc71b7a // indirect
 	github.com/fyne-io/image v0.0.0-20220602074514-4956b0afb3d2 // indirect
+	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/jsummers/gobmp v0.0.0-20151104160322-e2ba15ffa76e // indirect
 	github.com/rymdport/portal v0.2.6 // indirect
 	golang.org/x/mobile v0.0.0-20231127183840-76ac6878050a // indirect

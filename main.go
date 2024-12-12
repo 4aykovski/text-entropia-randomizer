@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/4aykovski/text-entropia-randomizer/lib"
 	"github.com/4aykovski/text-entropia-randomizer/ui"
 	"golang.org/x/exp/rand"
 )
@@ -44,7 +45,8 @@ func main() {
 		oneShiftOutput := generateStringWithNShift(text, symbolsFrequency, 1, *length)
 		twoShiftOutput := generateStringWithNShift(text, symbolsFrequency, 2, *length)
 
-		fmt.Println(calculateEntropy(symbolsFrequency))
+		block := lib.GenerateStringByBlocks(*path)
+		fmt.Println(block)
 
 		fmt.Println("entropy output \n\t", entropyOutput)
 		fmt.Println("one shift output \n\t ", oneShiftOutput)
